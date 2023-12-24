@@ -62,11 +62,11 @@ fn main() {
     // Get symbol locations
     let cols: u32 = contents.find('\n').unwrap() as u32 + 1;
     let rows: u32 = contents.len() as u32 / cols;
-    let symbols: Vec<Coords> = contents
+    let symbols: Vec<(char, Coords)> = contents
         .chars()
         .enumerate()
         .filter(|(_, c)| *c != '.' && !c.is_ascii_digit() && !c.is_whitespace())
-        .map(|(i, _)| (i as u32 / cols, i as u32 % cols))
+        .map(|(i, c)| (c, (i as u32 / cols, i as u32 % cols)))
         .collect();
 
     // Get number locations
@@ -87,8 +87,8 @@ fn main() {
         .iter()
         .filter(|n| -> bool {
             let surrounding = n.surrounding((rows, cols));
-            for s in &symbols {
-                if surrounding.contains(s) {
+            for (_, loc) in &symbols {
+                if surrounding.contains(loc) {
                     return true;
                 }
             }
@@ -98,4 +98,23 @@ fn main() {
         .sum();
 
     println!("{total}");
+
+    // Part B
+    let gears: u32 = symbols.iter().map(|(c, l)| {
+        if *c != '*' {
+            0
+        } else {
+            let nums: Vec<_> = numbers
+                .iter()
+                .filter(|n| n.surrounding((rows, cols)).contains(l))
+                .map(|n| n.value)
+                .collect();
+            if nums.len() == 2 {
+                nums.into_iter().reduce(|acc, v| acc * v).unwrap()
+            } else {
+                0
+            }
+        }
+    }).sum();
+    println!("{gears}");
 }
