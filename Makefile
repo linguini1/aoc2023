@@ -1,4 +1,4 @@
-COMPLETED_DAYS = 01
+COMPLETED_DAYS = 01 02
 INPUT = input.txt
 
 DAYS = $(patsubst %,day%,$(COMPLETED_DAYS))
