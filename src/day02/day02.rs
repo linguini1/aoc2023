@@ -32,6 +32,10 @@ impl Game {
     fn possible(&self) -> bool {
         self.maxes.0 <= TARGET_SET.0 && self.maxes.1 <= TARGET_SET.1 && self.maxes.2 <= TARGET_SET.2
     }
+
+    fn power(&self) -> u32 {
+        self.maxes.0 * self.maxes.1 * self.maxes.2
+    }
 }
 
 fn colour_count(set: &str) -> (Block, Block, Block) {
@@ -88,6 +92,11 @@ fn main() {
         })
         .collect();
 
+    // Part A
     let total: u32 = games.iter().filter(|g| g.possible()).map(|g| g.id).sum();
     println!("{total}");
+
+    // Part B
+    let power_sum: u32 = games.iter().map(|g| g.power()).sum();
+    println!("{power_sum}")
 }
