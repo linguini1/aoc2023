@@ -52,6 +52,18 @@ impl Map {
     }
 }
 
+fn map_until_location(maps: &HashMap<MapType, Map>, seed: &u64) -> u64 {
+    let mut cur_type = MapType::Seed;
+    let mut value = *seed;
+    while cur_type != MapType::Location {
+        let map = maps.get(&cur_type).unwrap();
+        let result = map.map(value);
+        cur_type = result.0;
+        value = result.1;
+    }
+    value
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     assert!(args.len() == 2);
@@ -108,19 +120,22 @@ fn main() {
         }
     }
 
-    let locations: Vec<u64> = seeds
-        .iter()
-        .map(|seed| {
-            let mut cur_type = MapType::Seed;
-            let mut value = *seed;
-            while cur_type != MapType::Location {
-                let map = maps.get(&cur_type).unwrap();
-                let result = map.map(value);
-                cur_type = result.0;
-                value = result.1;
-            }
-            value
-        })
-        .collect();
+    let locations: Vec<u64> = seeds.iter().map(|seed| map_until_location(&maps, seed)).collect();
     println!("{}", locations.iter().min().expect("No locations found."));
+
+    // Part B
+    let min_location: u64 = seeds
+        .windows(2)
+        .enumerate()
+        .filter(|(i, _)| i % 2 == 0) // Skips windows with overlaps to just get unique pairs
+        .map(|(_, slice)| {
+            // Gets minimum location of each seed range
+            (slice[0]..slice[0] + slice[1])
+                .map(|seed| map_until_location(&maps, &seed))
+                .min()
+                .unwrap()
+        })
+        .min()
+        .unwrap();
+    println!("{min_location}");
 }
