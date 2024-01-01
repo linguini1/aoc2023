@@ -16,6 +16,17 @@ impl Readings {
         }
         finals.iter().sum()
     }
+
+    fn prev_val(&self) -> i64 {
+        let mut prevs: Vec<i64> = vec![];
+        let mut working_set: Vec<i64> = self.raw.to_vec();
+        while !working_set.iter().all(|n| *n == 0) {
+            prevs.push(*working_set.first().expect("Expected at least one digit."));
+            working_set = working_set.windows(2).map(|w| w[1] - w[0]).collect();
+        }
+        prevs.push(0);
+        prevs.iter().rev().copied().reduce(|acc, e| e - acc).unwrap()
+    }
 }
 
 fn main() {
@@ -31,6 +42,12 @@ fn main() {
             raw: l.split(' ').map(|n| n.parse().expect("Expected number.")).collect(),
         })
         .collect();
+
+    // Part A
     let next_value_sum: i64 = readings.iter().map(|r| r.next_val()).sum();
     println!("{next_value_sum}");
+
+    // Part B
+    let prev_value_sum: i64 = readings.iter().map(|r| r.prev_val()).sum();
+    println!("{prev_value_sum}");
 }
