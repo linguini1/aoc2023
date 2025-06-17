@@ -2,4 +2,4 @@
 /target
 
 # Puzzle inputs
-input.txt
+*.txt
