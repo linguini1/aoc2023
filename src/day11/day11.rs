@@ -50,17 +50,8 @@ fn main() {
     // will have its column index (x) incremented by one.
 
     for galaxy in &mut galaxies {
-        for row in &empty_rows {
-            if galaxy.y > *row {
-                galaxy.y += 1;
-            }
-        }
-
-        for col in &empty_cols {
-            if galaxy.x > *col {
-                galaxy.x += 1;
-            }
-        }
+        galaxy.y += empty_rows.iter().filter(|r| galaxy.y > **r).count();
+        galaxy.x += empty_cols.iter().filter(|c| galaxy.x > **c).count();
     }
 
     // Now calculate the shortest distance between each pair of galaxies
@@ -72,7 +63,6 @@ fn main() {
         }
     }
 
-    println!("{}", distances.len());
     println!("{}", distances.iter().sum::<usize>());
 
     println!("{galaxies:?}");
