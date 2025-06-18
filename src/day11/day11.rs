@@ -64,6 +64,4 @@ fn main() {
     }
 
     println!("{}", distances.iter().sum::<usize>());
-
-    println!("{galaxies:?}");
 }
