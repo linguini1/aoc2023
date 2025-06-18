@@ -15,6 +15,35 @@ impl Galaxy {
     }
 }
 
+/// Takes a list of galaxies and maps them to an expanded galaxy list
+fn expanded_galaxies(
+    galaxies: &[Galaxy],
+    empty_rows: &[usize],
+    empty_cols: &[usize],
+    expansion_factor: usize,
+) -> Vec<Galaxy> {
+    assert!(expansion_factor > 1);
+    galaxies
+        .iter()
+        .map(|g| Galaxy {
+            y: g.y + empty_rows.iter().filter(|r| g.y > **r).count() * (expansion_factor - 1),
+            x: g.x + empty_cols.iter().filter(|c| g.x > **c).count() * (expansion_factor - 1),
+        })
+        .collect()
+}
+
+/// Returns a list of the Manhattan distances between each pair of galaxies
+fn galaxy_distances(galaxies: &[Galaxy]) -> Vec<usize> {
+    let mut distances: Vec<usize> = Vec::new();
+    for i in 0..galaxies.len() {
+        let g1 = &galaxies[i];
+        for g2 in galaxies.iter().skip(i + 1) {
+            distances.push(g1.manhattan_distance(g2));
+        }
+    }
+    distances
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     assert!(args.len() == 2);
@@ -25,7 +54,7 @@ fn main() {
     let n_cols = contents.lines().next().expect("At least one line").chars().count();
 
     // Parse galaxies from the puzzle input
-    let mut galaxies: Vec<_> = contents
+    let galaxies: Vec<_> = contents
         .lines()
         .enumerate()
         .flat_map(|(y, l)| {
@@ -49,19 +78,18 @@ fn main() {
     // incremented by one. Any galaxy with a column index (x) greater than an empty column's index
     // will have its column index (x) incremented by one.
 
-    for galaxy in &mut galaxies {
-        galaxy.y += empty_rows.iter().filter(|r| galaxy.y > **r).count();
-        galaxy.x += empty_cols.iter().filter(|c| galaxy.x > **c).count();
-    }
+    let doubled_galaxy = expanded_galaxies(&galaxies, &empty_rows, &empty_cols, 2);
 
     // Now calculate the shortest distance between each pair of galaxies
-    let mut distances: Vec<usize> = Vec::new();
-    for i in 0..galaxies.len() {
-        let g1 = &galaxies[i];
-        for g2 in galaxies.iter().skip(i + 1) {
-            distances.push(g1.manhattan_distance(g2));
-        }
-    }
 
-    println!("{}", distances.iter().sum::<usize>());
+    let double_distances = galaxy_distances(&doubled_galaxy);
+
+    println!("{}", double_distances.iter().sum::<usize>());
+
+    // For part two we do the same, but use a bigger expansion factor
+
+    let large_galaxy = expanded_galaxies(&galaxies, &empty_rows, &empty_cols, 1000000);
+    let large_distances = galaxy_distances(&large_galaxy);
+
+    println!("{}", large_distances.iter().sum::<usize>());
 }
