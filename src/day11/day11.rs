@@ -67,11 +67,12 @@ fn main() {
     let mut distances: Vec<usize> = Vec::new();
     for i in 0..galaxies.len() {
         let g1 = &galaxies[i];
-        for g2 in galaxies.iter().skip(i) {
+        for g2 in galaxies.iter().skip(i + 1) {
             distances.push(g1.manhattan_distance(g2));
         }
     }
 
+    println!("{}", distances.len());
     println!("{}", distances.iter().sum::<usize>());
 
     println!("{galaxies:?}");
